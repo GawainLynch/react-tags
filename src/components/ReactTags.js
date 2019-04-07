@@ -9,7 +9,6 @@ import PropTypes from 'prop-types';
 import ClassNames from 'classnames';
 import Tag from './Tag';
 import { Input, Grid } from '@material-ui/core';
-
 import { buildRegExpFromDelimiters } from './utils';
 
 //Constants
