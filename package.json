@@ -36,6 +36,7 @@
     "react-dom": "^16.3.1"
   },
   "dependencies": {
+    "@material-ui/core": "^3.9.3",
     "classnames": "~2.2.6",
     "lodash": "~4.17.12",
     "prop-types": "~15.7.0"
@@ -52,6 +53,7 @@
     "babel-register": "^6.26.0",
     "chai": "^4.1.2",
     "commitizen": "^4.0.4",
+    "cross-env": "^5.2.0",
     "css-loader": "^3.2.1",
     "cz-conventional-changelog": "^3.0.0",
     "enzyme": "^3.9.0",

@@ -8,6 +8,7 @@ import Suggestions from './Suggestions';
 import PropTypes from 'prop-types';
 import ClassNames from 'classnames';
 import Tag from './Tag';
+import { Input, Grid } from '@material-ui/core';
 
 import { buildRegExpFromDelimiters } from './utils';
 
@@ -45,6 +46,7 @@ class ReactTags extends Component {
     allowDeleteFromEmptyInput: PropTypes.bool,
     allowAdditionFromPaste: PropTypes.bool,
     allowDragDrop: PropTypes.bool,
+    allowNew: PropTypes.bool,
     handleInputChange: PropTypes.func,
     handleInputFocus: PropTypes.func,
     handleInputBlur: PropTypes.func,
@@ -78,12 +80,13 @@ class ReactTags extends Component {
     inputFieldPosition: INPUT_FIELD_POSITIONS.INLINE,
     handleDelete: noop,
     handleAddition: noop,
-    allowDeleteFromEmptyInput: true,
+    allowDeleteFromEmptyInput: false,
     allowAdditionFromPaste: true,
     autocomplete: false,
     readOnly: false,
     allowUnique: true,
     allowDragDrop: true,
+    allowNew: true,
     tags: [],
   };
 
@@ -301,7 +304,8 @@ class ReactTags extends Component {
   }
 
   addTag = (tag) => {
-    const { tags, labelField, allowUnique } = this.props;
+    const { tags, labelField, allowUnique, allowNew, autocomplete } = this.props;
+    const { selectedIndex, suggestions } = this.state;
     if (!tag.id || !tag[labelField]) {
       return;
     }
@@ -311,31 +315,43 @@ class ReactTags extends Component {
     if (allowUnique && existingKeys.indexOf(tag.id.toLowerCase()) >= 0) {
       return;
     }
-    if (this.props.autocomplete) {
+    if (autocomplete) {
       const possibleMatches = this.filteredSuggestions(
         tag[labelField],
         this.props.suggestions
       );
 
       if (
-        (this.props.autocomplete === 1 && possibleMatches.length === 1) ||
-        (this.props.autocomplete === true && possibleMatches.length)
+        (autocomplete === 1 && possibleMatches.length === 1) ||
+        (autocomplete === true && possibleMatches.length)
       ) {
         tag = possibleMatches[0];
       }
     }
 
     // call method to add
-    this.props.handleAddition(tag);
+    if (allowNew) {
+      // call method to add
+      this.props.handleAddition(tag);
+      // reset the state
+      this.setState({
+        query: '',
+        selectionMode: false,
+        selectedIndex: -1,
+      });
 
-    // reset the state
-    this.setState({
-      query: '',
-      selectionMode: false,
-      selectedIndex: -1,
-    });
+        this.resetAndFocusInput();
+      } else if (selectedIndex !== -1) {
+        this.props.handleAddition(suggestions[selectedIndex]);
+        // reset the state
+        this.setState({
+          query: '',
+          selectionMode: false,
+          selectedIndex: -1,
+        });
 
-    this.resetAndFocusInput();
+        this.resetAndFocusInput();
+      }
   };
 
   handleSuggestionClick(i) {
@@ -373,19 +389,21 @@ class ReactTags extends Component {
     const moveTag = allowDragDrop ? this.moveTag : null;
     return tags.map((tag, index) => {
       return (
-        <Tag
-          key={tag.key || tag.id}
-          index={index}
-          tag={tag}
-          labelField={labelField}
-          onDelete={this.handleDelete.bind(this, index)}
-          moveTag={moveTag}
-          removeComponent={removeComponent}
-          onTagClicked={this.handleTagClick.bind(this, index)}
-          readOnly={readOnly}
-          classNames={{ ...DEFAULT_CLASSNAMES, ...classNames }}
-          allowDragDrop={allowDragDrop}
-        />
+          <Grid item key={`${tag.id}-${index}`}>
+            <Tag
+                key={tag.key || tag.id}
+                index={index}
+                tag={tag}
+                labelField={labelField}
+                onDelete={this.handleDelete.bind(this, index)}
+                moveTag={moveTag}
+                removeComponent={removeComponent}
+                onTagClicked={this.handleTagClick.bind(this, index)}
+                readOnly={readOnly}
+                classNames={{ ...DEFAULT_CLASSNAMES, ...classNames }}
+                allowDragDrop={allowDragDrop}
+            />
+          </Grid>
       );
     });
   };
@@ -414,8 +432,8 @@ class ReactTags extends Component {
 
     const tagInput = !this.props.readOnly ? (
       <div className={classNames.tagInput}>
-        <input
-          ref={(input) => {
+        <Input
+          inputRef={(input) => {
             this.textInput = input;
           }}
           className={classNames.tagInputField}
@@ -450,14 +468,16 @@ class ReactTags extends Component {
     ) : null;
 
     return (
-      <div className={ClassNames(classNames.tags, 'react-tags-wrapper')}>
-        {position === INPUT_FIELD_POSITIONS.TOP && tagInput}
-        <div className={classNames.selected}>
-          {tagItems}
-          {position === INPUT_FIELD_POSITIONS.INLINE && tagInput}
-        </div>
-        {position === INPUT_FIELD_POSITIONS.BOTTOM && tagInput}
-      </div>
+        <Grid container className={ClassNames(classNames.tags, 'react-tags-wrapper')}>
+          {inputFieldPosition === INPUT_FIELD_POSITIONS.TOP && <Grid item xs={12}>{tagInput}</Grid>}
+          <Grid item>
+            <Grid container spacing={8}>
+              {tagItems}
+              {inputFieldPosition === INPUT_FIELD_POSITIONS.INLINE && <Grid item>{tagInput}</Grid>}
+            </Grid>
+          </Grid>
+          {inputFieldPosition === INPUT_FIELD_POSITIONS.BOTTOM && <Grid item xs={12}>{tagInput}</Grid>}
+        </Grid>
     );
   }
 }

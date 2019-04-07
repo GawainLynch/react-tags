@@ -10,6 +10,7 @@ import {
   dropCollect,
 } from './DragAndDropHelper';
 import { canDrag } from './utils';
+import { Chip } from '@material-ui/core';
 
 import RemoveComponent from './RemoveComponent';
 
@@ -29,20 +30,13 @@ class Tag extends Component {
     } = props;
     const { className = '' } = tag;
     // eslint-disable-next-line
-    const tagComponent = ( <span
-      className={ClassNames('tag-wrapper', classNames.tag, className)}
-      style={{opacity: isDragging ? 0 : 1, 'cursor': canDrag(props) ? 'move' : 'auto'}}
-      onClick={props.onTagClicked}
-      onTouchStart={props.onTagClicked}>
-      {label}
-      <RemoveComponent
-        tag={props.tag}
-        className={classNames.remove}
-        removeComponent={props.removeComponent}
-        onClick={props.onDelete}
-        readOnly={readOnly}
-      />
-    </span>
+    const tagComponent = (
+        <div className={ClassNames('tag-wrapper', classNames.tag, className)}>
+          <Chip
+              label={label}
+              style={{ opacity: isDragging ? 0 : 1, 'cursor': canDrag(props) ? 'move' : 'auto' }}
+              onDelete={(!readOnly) ? props.onDelete : null } />
+        </div>
     );
     return connectDragSource(connectDropTarget(tagComponent));
   }
