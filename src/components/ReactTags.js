@@ -429,7 +429,7 @@ class ReactTags extends Component {
       ? INPUT_FIELD_POSITIONS.BOTTOM
       : inputFieldPosition;
 
-    const tagInput = !this.props.readOnly ? (
+    const tagInput = !this.props.readOnly && (
       <div className={classNames.tagInput}>
         <Input
           inputRef={(input) => {
@@ -464,7 +464,7 @@ class ReactTags extends Component {
           renderSuggestion={this.props.renderSuggestion}
         />
       </div>
-    ) : null;
+    );
 
     return (
         <Grid container className={ClassNames(classNames.tags, 'react-tags-wrapper')}>
