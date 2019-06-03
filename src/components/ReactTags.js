@@ -470,7 +470,7 @@ class ReactTags extends Component {
         <Grid container className={ClassNames(classNames.tags, 'react-tags-wrapper')}>
           {inputFieldPosition === INPUT_FIELD_POSITIONS.TOP && <Grid item xs={12}>{tagInput}</Grid>}
           <Grid item>
-            <Grid container spacing={8}>
+            <Grid container spacing={1}>
               {tagItems}
               {inputFieldPosition === INPUT_FIELD_POSITIONS.INLINE && <Grid item>{tagInput}</Grid>}
             </Grid>
